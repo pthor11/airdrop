@@ -1,67 +1,68 @@
 import { mtproto, api } from "./api";
 import { API_HASH, API_ID, BOT_TOKEN } from "./config";
 
-const start = async () => {
-    try {
+const Slimbot = require('slimbot');
+const slimbot = new Slimbot(BOT_TOKEN);
 
-        // const sendCode = await api.call('auth.sendCode', {
-        //     phone_number: '+840942391867',
-        //     settings: {
-        //         _: 'codeSettings',
-        //     },
-        // })
+// Register listeners
 
-        // console.log({ sendCode });
+slimbot.on('message', (message: any) => {
+    console.log({message: JSON.stringify(message)});
 
-        // const smsCode = await api.call('auth.codeTypeSms', {})
+    slimbot.sendMessage(message.chat.id, 'bot got message then sent to user');
+    // slimbot.sendMessage(-1001415313656, 'bot got message then sent to group');
+});
 
-        // console.log({smsCode});
+// Call API
+
+slimbot.startPolling();
+
+// const start = async () => {
+//     try {
+
+//         // const sendCode = await api.call('auth.sendCode', {
+//         //     phone_number: '+840942391867',
+//         //     settings: {
+//         //         _: 'codeSettings',
+//         //     },
+//         // })
+
+//         // console.log({ sendCode });
+
+//         // const smsCode = await api.call('auth.codeTypeSms', {})
+
+//         // console.log({smsCode});
+
+//         // const defaultDC = await mtproto.setDefaultDc(5)
+
+//         // console.log({ defaultDC });
 
 
-        // const user = await mtproto.call('users.getFullUser', {
-        //     id: {
-        //         _: 'inputUserSelf',
-        //     },
-        // })
+//         // console.log({ app_id: API_ID, api_hash: API_HASH, bot_auth_token: BOT_TOKEN });
 
-        // console.log({ user });
 
-        const signIn = await api.call('auth.importBotAuthorization', { app_id: API_ID, api_hash: API_HASH, bot_auth_token: BOT_TOKEN }/* , { syncAuth: false } */)
+//         // const signIn = await api.call('auth.importBotAuthorization', { app_id: API_ID, api_hash: API_HASH, bot_auth_token: BOT_TOKEN }/* , { syncAuth: false } */)
 
-        console.log({ signIn });
+//         // console.log({ signIn });
 
-        // mtproto.updates.on('updates', (data: any) => {
-        //     console.log(JSON.stringify(data))
-        // });
+//         // mtproto.updates.on('updates', (data: any) => {
+//         //     console.log(JSON.stringify(data))
+//         // });
 
-        // const getFullChannel = await api.call('channels.getFullChannel', {
-        //     channel: {
-        //         _: 'inputChannel',
-        //         channel_id: 'it52info',
+//         // const getFullChannel = await api.call('channels.getFullChannel', {
+//         //     channel: {
+//         //         _: 'inputChannel',
+//         //         channel_id: 'it52info',
 
-        //     }
-        // })
+//         //     }
+//         // })
 
-        // console.log({ getFullChannel });
+//         // console.log({ getFullChannel });
 
-        const Slimbot = require('slimbot');
-        const slimbot = new Slimbot(BOT_TOKEN);
 
-        // Register listeners
+//     } catch (e) {
+//         console.error({ e })
+//     }
+// }
 
-        slimbot.on('message', (message: any) => {
-            console.log({message: JSON.stringify(message)});
-            
-            slimbot.sendMessage(message.chat.id, 'Message received');
-        });
-
-        // Call API
-
-        slimbot.startPolling();
-
-    } catch (e) {
-        console.error({ e })
-    }
-}
-
-start()
+// start()

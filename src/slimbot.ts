@@ -1,14 +1,14 @@
-import { BOT_TOKEN } from "./config";
+// import { BOT_TOKEN } from "./config";
 
-const Slimbot = require('slimbot');
-const slimbot = new Slimbot(BOT_TOKEN);
+// const Slimbot = require('slimbot');
+// const slimbot = new Slimbot(BOT_TOKEN);
 
-// Register listeners
+// // Register listeners
 
-slimbot.on('message', (message:any) => {
-  slimbot.sendMessage(message.chat.id, 'Message received');
-});
+// slimbot.on('message', (message:any) => {
+//   slimbot.sendMessage(message.chat.id, 'Message received');
+// });
 
-// Call API
+// // Call API
 
-slimbot.startPolling();
+// slimbot.startPolling();
