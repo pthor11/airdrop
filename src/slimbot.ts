@@ -1,4 +1,5 @@
-import { BOT_TOKEN } from "./config";
+import axios from "axios";
+import { BOT_TOKEN, GROUP_ID, CHANNEL_ID } from "./config";
 import { Message } from "./models/Message";
 import { User } from "./models/User";
 import { client, collections } from "./mongo";
@@ -6,6 +7,21 @@ import { tronweb } from "./tronweb";
 
 const Slimbot = require('slimbot');
 const slimbot = new Slimbot(BOT_TOKEN);
+
+// Check is member
+
+const isMember = async (user_id: number, chat_id: string): Promise<boolean> => {
+    try {
+        const { data } = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMember`, { user_id, chat_id: `@${chat_id}` })
+
+        console.log({ data });
+
+        return data?.result.status === 'left' ? false : true
+    } catch (e) {
+        console.error(e);
+        return false
+    }
+}
 
 // Register listeners
 
@@ -29,6 +45,31 @@ slimbot.on('message', async (message: Message) => {
 
             return await slimbot.sendMessage(message.chat.id, `You have already claimed ${foundUser.amount} for address ${foundUser.address} at ${foundUser.createdAt}, txid: ${foundUser.txid}`)
         } else {
+            const [isGroupMember, isChannelMember] = await Promise.all([
+                isMember(message.from.id, GROUP_ID),
+                isMember(message.from.id, CHANNEL_ID),
+            ])
+
+            if (!isGroupMember) {
+                await session.abortTransaction()
+                session.endSession()
+
+                return await Promise.all([
+                    slimbot.sendMessage(message.chat.id, `You must be to join to the group ${GROUP_ID}`),
+                    slimbot.sendMessage(message.chat.id, `https://t.me/${GROUP_ID}`)
+                ])
+            }
+
+            if (!isChannelMember) {
+                await session.abortTransaction()
+                session.endSession()
+
+                return await Promise.all([
+                    slimbot.sendMessage(message.chat.id, `You must be to join to the channel ${CHANNEL_ID}`),
+                    slimbot.sendMessage(message.chat.id, `https://t.me/${CHANNEL_ID}`)
+                ])
+            }
+
             const address = message.text
 
             if (!tronweb.isAddress(address)) return slimbot.sendMessage(message.chat.id, `Invalid TRX address. Please re-enter a valid TRX address`)
