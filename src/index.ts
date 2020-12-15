@@ -18,27 +18,46 @@ const start = async () => {
         // console.log({smsCode});
 
 
-        const user = await mtproto.call('users.getFullUser', {
-            id: {
-                _: 'inputUserSelf',
-            },
-        })
+        // const user = await mtproto.call('users.getFullUser', {
+        //     id: {
+        //         _: 'inputUserSelf',
+        //     },
+        // })
 
-        console.log({ user });
+        // console.log({ user });
 
         const signIn = await api.call('auth.importBotAuthorization', { app_id: API_ID, api_hash: API_HASH, bot_auth_token: BOT_TOKEN }/* , { syncAuth: false } */)
 
         console.log({ signIn });
 
-        mtproto.updates.on('updates', (data: any) => {
-            console.log(JSON.stringify(data))
+        // mtproto.updates.on('updates', (data: any) => {
+        //     console.log(JSON.stringify(data))
+        // });
+
+        // const getFullChannel = await api.call('channels.getFullChannel', {
+        //     channel: {
+        //         _: 'inputChannel',
+        //         channel_id: 'it52info',
+
+        //     }
+        // })
+
+        // console.log({ getFullChannel });
+
+        const Slimbot = require('slimbot');
+        const slimbot = new Slimbot(BOT_TOKEN);
+
+        // Register listeners
+
+        slimbot.on('message', (message: any) => {
+            console.log({message: JSON.stringify(message)});
+            
+            slimbot.sendMessage(message.chat.id, 'Message received');
         });
 
-        const getFullChat = await api.call('messages.getFullChat', {
-            chat_id: -1001415313656
-        })
+        // Call API
 
-        console.log({ getFullChat });
+        slimbot.startPolling();
 
     } catch (e) {
         console.error({ e })

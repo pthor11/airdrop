@@ -110,6 +110,7 @@
     "semver": "^5.7.1",
     "semver-diff": "^3.1.1",
     "signal-exit": "^3.0.3",
+    "slimbot": "^4.9.0",
     "source-map": "^0.6.1",
     "source-map-support": "^0.5.19",
     "string-width": "^4.2.0",
