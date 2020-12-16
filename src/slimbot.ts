@@ -14,7 +14,7 @@ const isMember = async (user_id: number, chat_id: string): Promise<boolean> => {
     try {
         const { data } = await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/getChatMember`, { user_id, chat_id: `@${chat_id}` })
 
-        console.log({ data });
+        // console.log({ data });
 
         return data?.result.status === 'left' ? false : true
     } catch (e) {
@@ -26,12 +26,11 @@ const isMember = async (user_id: number, chat_id: string): Promise<boolean> => {
 // Register listeners
 
 slimbot.on('message', async (message: Message) => {
-    console.log({ message });
+    console.log({ message: JSON.stringify(message) });
 
-    if (message.from.is_bot) return slimbot.sendMessage(message.chat.id, 'message from bot is not supported').catch(console.error)
-    if (message.chat.type !== 'private') return slimbot.sendMessage(message.chat.id, 'only supporting for directly private message').catch(console.error)
-    if (message.text === '/start') return slimbot.sendMessage(message.chat.id, 'Please enter your TRX address below').catch(console.error)
-
+    if (message.from.is_bot) return slimbot.sendMessage(message.from.id, 'message from bot is not supported').catch(console.error)
+    if (message.chat.type !== 'private') return slimbot.sendMessage(message.from.id, 'only supporting for directly private message').catch(console.error)
+    
     const session = client.startSession()
     session.startTransaction()
 
@@ -45,6 +44,8 @@ slimbot.on('message', async (message: Message) => {
 
             return await slimbot.sendMessage(message.chat.id, `You have already claimed ${foundUser.amount} for address ${foundUser.address} at ${foundUser.createdAt}, txid: ${foundUser.txid}`)
         } else {
+            if (message.text === '/start') return slimbot.sendMessage(message.chat.id, 'Please use enter a valid TRX address').catch(console.error)
+
             const [isGroupMember, isChannelMember] = await Promise.all([
                 isMember(message.from.id, GROUP_ID),
                 isMember(message.from.id, CHANNEL_ID),
@@ -98,8 +99,9 @@ slimbot.on('message', async (message: Message) => {
             session.endSession()
 
             return await Promise.all([
-                slimbot.sendMessage(message.chat.id, `Congrats ${message.from.first_name} ${message.from.last_name}! You have been successful claimed ${amount} USDT for address ${address}.`),
-                slimbot.sendMessage(message.chat.id, `https://tronscan.org/#/transaction/${txid}`)
+                slimbot.sendMessage(message.chat.id, `Congrats ${message.from?.first_name || ''} ${message.from?.last_name || ''}! You have been successful claimed ${amount} USDT for address ${address}.`),
+                slimbot.sendMessage(message.chat.id, `https://tronscan.org/#/transaction/${txid}`),
+                slimbot.sendMessage(`@${GROUP_ID}`, `Sent ${amount} USDT to ${address} of ${message.from.first_name + message.from.last_name}, txid: ${txid}`)
             ])
         }
     } catch (e) {
